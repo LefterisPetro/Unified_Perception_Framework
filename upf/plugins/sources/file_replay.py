@@ -1,6 +1,7 @@
 import asyncio
 import json
 from upf.core.events import BaseEvent
+from upf.core.event_types import EventType
 
 class FileReplaySource:
     def __init__(self, file_path, source_id="file_replay"):
@@ -13,7 +14,7 @@ class FileReplaySource:
                 data = json.loads(line.strip())
 
                 event = BaseEvent.create(
-                    event_type="MeasurementEvent",
+                    event_type=EventType.MEASUREMENT,
                     source_id=self.source_id,
                     payload=data
                 )

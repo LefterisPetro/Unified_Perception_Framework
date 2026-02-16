@@ -1,16 +1,18 @@
+from upf.core.event_types import EventType
+
 class ConsoleSink:
 
     @property
     def supported_event_types(self):
-        return[
-            "MeasurementEvent",
-            "AlertEvent",
-            "SystemHealthEvent"
-        ]
+        return[EventType.MEASUREMENT,
+               EventType.ALERT,
+               EventType.SYSTEM_HEALTH,
+               EventType.CORRELATED_ALERT
+               ]
 
     async def handle(self, event):
         print(
-            f"[{event.event_type}] "
+            f"[{event.event_type.value}] "
             f"id={event.event_id[:8]} "
             f"corr={event.correlation_id} "
             f"from {event.source_id} "

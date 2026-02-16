@@ -1,12 +1,13 @@
 import time
 from collections import deque
 from upf.core.events import BaseEvent
+from upf.core.event_types import EventType
 
 class TemporalAggregatorProcessor:
 
     @property
     def supported_event_types(self):
-        return["MeasurementEvent"]
+        return[EventType.MEASUREMENT]
     
     def __init__(self, threshold, window_seconds, min_count):
         self.threshold = threshold
@@ -37,7 +38,7 @@ class TemporalAggregatorProcessor:
             self.active = True
 
             alert = BaseEvent.create(
-                event_type="AlertEvent",
+                event_type=EventType.ALERT,
                 source_id="temporal_aggregator",
                 payload={
                     "message": "Temporal threshold exceeded",

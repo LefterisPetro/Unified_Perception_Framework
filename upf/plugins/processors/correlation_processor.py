@@ -1,10 +1,11 @@
 from upf.core.events import BaseEvent
+from upf.core.event_types import EventType
 
 class CorrelationProcessor:
 
     @property
     def supported_event_types(self):
-        return ["AlertEvent", "SystemHealthEvent"]
+        return [EventType.ALERT, EventType.SYSTEM_HEALTH]
     
     def __init__(self):
         self.last_health_status = None
@@ -12,12 +13,12 @@ class CorrelationProcessor:
     async def process(self, event, bus):
 
         #Αν είναι health event, ενημερώνουμε κατάσταση
-        if event.event_type == "SystemHealthEvent":
+        if event.event_type == EventType.SYSTEM_HEALTH:
             self.last_health_status = event.payload.get("status")
             return
         
         #Αν είναι alert event
-        if event.event_type == "AlertEvent":
+        if event.event_type == EventType.ALERT:
 
             #Φιλτράρουμε μόνο alerts από temporal_aggregator
             if event.source_id != "temporal_aggregator":
@@ -27,7 +28,7 @@ class CorrelationProcessor:
             if self.last_health_status == "OK":
 
                 correlated_alert = BaseEvent.create(
-                    event_type="CorrelatedAlertEvent",
+                    event_type=EventType.CORRELATED_ALERT,
                     source_id="correlation_processor",
                     payload={
                         "message": "Correlated Alert",
