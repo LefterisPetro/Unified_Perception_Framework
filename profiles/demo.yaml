@@ -1,0 +1,5 @@
+source:
+  file: "demo_data.jsonl"
+
+rules:
+  threshold: 50

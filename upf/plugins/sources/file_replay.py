@@ -1,0 +1,23 @@
+import asyncio
+import json
+from upf.core.events import BaseEvent
+
+class FileReplaySource:
+    def __init__(self, file_path, source_id="file_replay"):
+        self.file_path = file_path
+        self.source_id = source_id
+
+    async def start(self, bus):
+        with open(self.file_path, "r") as f:
+            for line in f:
+                data = json.loads(line.strip())
+
+                event = BaseEvent.create(
+                    event_type="MeasurementEvent",
+                    source_id=self.source_id,
+                    payload=data
+                )
+
+                await bus.publish(event)
+                await asyncio.sleep(0.5)
+                
