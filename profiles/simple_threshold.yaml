@@ -1,0 +1,15 @@
+sources:
+  - type: FileReplaySource
+    params:
+      file_path: demo_data.jsonl
+
+processors:
+  - type: TemporalAggregatorProcessor
+    params:
+      threshold: 50
+      window_seconds: 1 
+      min_count: 1
+
+sinks:
+  - type: ConsoleSink
+  - type: AlertOnlySink

@@ -1,5 +1,23 @@
-source:
-  file: "demo_data.jsonl"
+sources:
+  - type: FileReplaySource
+    params:
+      file_path: demo_data.jsonl
 
-rules:
-  threshold: 50
+  - type: HealthSource
+    params:
+      source_id: system_health
+
+processors:
+  - type: TemporalAggregatorProcessor
+    params:
+      threshold: 50
+      window_seconds: 3 
+      min_count: 2
+
+  - type: CorrelationProcessor
+    params: {}
+
+sinks:
+  - type: ConsoleSink
+  - type: AlertOnlySink
+  - type: CorrelatedAlertSink
