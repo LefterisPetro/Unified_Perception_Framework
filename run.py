@@ -49,18 +49,11 @@ async def main(profile_path):
     
     config = load_config(profile_path)
 
-    required_sections = ["sources", "processors", "sinks"]
-    for section in required_sections:
-        if section not in config:
-            raise ProfileValidationError(
-                f"Profile missing required section: '{section}'"
-            )
-    
     bus = EventBus()
 
-    sources = [instantiate_component(s) for s in config["sources"]]
-    processors = [instantiate_component(p) for p in config["processors"]]
-    sinks = [instantiate_component(s) for s in config["sinks"]]
+    sources = [instantiate_component(s.model_dump()) for s in config.sources]
+    processors = [instantiate_component(p.model_dump()) for p in config.processors]
+    sinks = [instantiate_component(s.model_dump()) for s in config.sinks]
 
     runner = Runner(
         sources=sources,
