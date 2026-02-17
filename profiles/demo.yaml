@@ -13,6 +13,14 @@ processors:
       threshold: 50
       window_seconds: 3 
       min_count: 2
+  
+  - type: ScoringProcessor
+    params:
+      base_confidence: 0.5
+
+  - type: FusionGateProcessor
+    params:
+      min_confidence: 0.65
 
   - type: CorrelationProcessor
     params: {}
@@ -21,3 +29,4 @@ sinks:
   - type: ConsoleSink
   - type: AlertOnlySink
   - type: CorrelatedAlertSink
+  - type: ScoredAlertSink

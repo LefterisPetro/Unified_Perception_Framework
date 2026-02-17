@@ -5,7 +5,7 @@ class CorrelationProcessor:
 
     @property
     def supported_event_types(self):
-        return [EventType.ALERT, EventType.SYSTEM_HEALTH]
+        return [EventType.FUSION_READY_ALERT, EventType.SYSTEM_HEALTH]
     
     def __init__(self):
         self.last_health_status = None
@@ -18,11 +18,12 @@ class CorrelationProcessor:
             return
         
         #Αν είναι alert event
-        if event.event_type == EventType.ALERT:
+        if event.event_type == EventType.FUSION_READY_ALERT:
 
             #Φιλτράρουμε μόνο alerts από temporal_aggregator
-            if event.source_id != "temporal_aggregator":
+            if event.source_id != "fusion_gate_processor":
                 return
+
 
             #Ελέγχομυε health condition
             if self.last_health_status == "OK":
