@@ -1,5 +1,6 @@
 from upf.core.event_types import EventType
 from upf.core.events import BaseEvent
+from upf.core.event_payloads import FusionReadyPayload
 
 class FusionGateProcessor:
 
@@ -12,15 +13,21 @@ class FusionGateProcessor:
     
     async def process(self, event, bus):
 
-        confidence = float(event.payload.get("confidence", 0))
+        confidence = event.payload.confidence
 
         if confidence < self.min_confidence:
             return #Drop low confidence alerts
         
+        fusion_payload = FusionReadyPayload(
+            original_alert=event.payload,
+            confidence=confidence,
+            severity=event.payload.severity
+        )
+
         fusion_event = BaseEvent.create(
             event_type=EventType.FUSION_READY_ALERT,
             source_id="fusion_gate_processor",
-            payload=event.payload,
+            payload=fusion_payload,
             correlation_id=event.event_id
         )
 

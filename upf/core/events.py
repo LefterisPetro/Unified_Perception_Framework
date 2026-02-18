@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
 import time
 import uuid
@@ -10,9 +10,9 @@ class BaseEvent(BaseModel):
     event_type: EventType
     timestamp: float
     source_id: str
-    payload: Dict[str, Any]
-    meta: Dict[str, Any] = {}
-    processing_history: List[str] = []
+    payload: Any
+    meta: Dict[str, Any] = Field(default_factory=dict)
+    processing_history: List[str] = Field(default_factory=list)
 
     @staticmethod
     def create(event_type: EventType, source_id, payload, correlation_id=None):

@@ -1,4 +1,5 @@
 from upf.core.event_types import EventType
+from upf.utilities.serialization import serialize_payload
 
 class ScoredAlertSink:
 
@@ -7,4 +8,4 @@ class ScoredAlertSink:
         return [EventType.SCORED_ALERT]
     
     async def handle(self, event):
-        print("### SCORED ALERT:", event.payload)
+        print("### SCORED ALERT:", serialize_payload(event.payload))

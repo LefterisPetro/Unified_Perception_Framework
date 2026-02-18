@@ -1,4 +1,5 @@
 from upf.core.event_types import EventType
+from upf.utilities.serialization import serialize_payload
 
 class AlertOnlySink:
 
@@ -7,4 +8,4 @@ class AlertOnlySink:
         return[EventType.ALERT]
     
     async def handle(self, event):
-        print(">>> ALERT RECEIVED:", event.payload)
+        print(">>> ALERT RECEIVED:", serialize_payload(event.payload))

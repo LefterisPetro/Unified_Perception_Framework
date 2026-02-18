@@ -1,4 +1,5 @@
 from upf.core.event_types import EventType
+from upf.utilities.serialization import serialize_payload
 
 class ConsoleSink:
 
@@ -12,10 +13,13 @@ class ConsoleSink:
                ]
 
     async def handle(self, event):
+
+        payload_out = serialize_payload(event.payload)
+
         print(
             f"[{event.event_type.value}] "
             f"id={event.event_id[:8]} "
             f"corr={event.correlation_id} "
             f"from {event.source_id} "
-            f" -> {event.payload}"
+            f" -> {payload_out}"
             )

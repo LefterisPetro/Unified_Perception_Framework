@@ -1,5 +1,6 @@
 from upf.core.events import BaseEvent
 from upf.core.event_types import EventType
+from upf.core.event_payloads import CorrelatedAlertPayload
 
 class CorrelationProcessor:
 
@@ -14,7 +15,7 @@ class CorrelationProcessor:
 
         #Αν είναι health event, ενημερώνουμε κατάσταση
         if event.event_type == EventType.SYSTEM_HEALTH:
-            self.last_health_status = event.payload.get("status")
+            self.last_health_status = event.payload.status
             return
         
         #Αν είναι alert event
@@ -28,13 +29,15 @@ class CorrelationProcessor:
             #Ελέγχομυε health condition
             if self.last_health_status == "OK":
 
+                correlated_payload = CorrelatedAlertPayload(
+                    message="Correlated Alert",
+                    original_alert=event.payload
+                )
+
                 correlated_alert = BaseEvent.create(
                     event_type=EventType.CORRELATED_ALERT,
                     source_id="correlation_processor",
-                    payload={
-                        "message": "Correlated Alert",
-                        "original_alert": event.payload
-                    },
+                    payload=correlated_payload,
                     correlation_id=event.event_id
                 )
 

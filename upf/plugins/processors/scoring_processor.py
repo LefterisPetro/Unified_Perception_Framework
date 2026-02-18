@@ -1,5 +1,6 @@
 from upf.core.event_types import EventType
 from upf.core.events import BaseEvent
+from upf.core.event_payloads import ScoredAlertPayload
 
 class ScoringProcessor:
 
@@ -13,7 +14,7 @@ class ScoringProcessor:
     async def process(self, event, bus):
 
         #Simple scoring based on count evidence
-        count = event.payload.get("count", 1)
+        count = event.payload.count
 
         confidence = min(1.0, self.base_confidence + (count * 0.1))
 
@@ -24,14 +25,16 @@ class ScoringProcessor:
         else:
             severity = "LOW"
 
+        scored_payload = ScoredAlertPayload(
+                original_alert=event.payload,
+                confidence=round(confidence, 2),
+                severity=severity
+        )
+ 
         scored_event = BaseEvent.create(
             event_type=EventType.SCORED_ALERT,
             source_id="scoring_processor",
-            payload={
-                "original_alert": event.payload,
-                "confidence": round(confidence, 2),
-                "severity": severity
-            },
+            payload=scored_payload,
             correlation_id=event.event_id
         )
 

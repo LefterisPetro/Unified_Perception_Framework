@@ -16,3 +16,25 @@ Profile-Driven runtime
 
 και να αλλάζει όλο το pipeline χωρίς να πειράζουμε τον κώδικα.
 
+(18/2)
+Το UPF τώρα έχει:
+--Core
+EventBus
+Runner
+Typed BaseEvent
+Deterministic event types
+
+--Payload Layer
+Strict Pydantic models
+Fully nested typed chain
+No dynamic schema guessing
+
+--Plugin Layer
+Modular processors
+Config-driven instantiation
+Strict constructor validation
+
+--Boundary Layer
+Centralized serialization helper
+Clean sink abstraction
+Stable output

@@ -1,4 +1,5 @@
 from upf.core.event_types import EventType
+from upf.utilities.serialization import serialize_payload
 
 class CorrelatedAlertSink:
 
@@ -7,5 +8,5 @@ class CorrelatedAlertSink:
         return[EventType.CORRELATED_ALERT]
     
     async def handle(self, event):
-        print("### CORRELATED ALERT:", event.payload)
+        print("### CORRELATED ALERT:", serialize_payload(event.payload))
         
