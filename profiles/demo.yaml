@@ -8,6 +8,10 @@ sources:
       source_id: system_health
 
 processors:
+  - type: MetricsProcessor
+    params:
+      window_seconds: 5
+
   - type: TemporalAggregatorProcessor
     params:
       threshold: 50

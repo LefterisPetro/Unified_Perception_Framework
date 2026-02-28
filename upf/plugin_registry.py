@@ -5,6 +5,7 @@ from upf.plugins.processors.temporal_aggregator import TemporalAggregatorProcess
 from upf.plugins.processors.correlation_processor import CorrelationProcessor
 from upf.plugins.processors.scoring_processor import ScoringProcessor
 from upf.plugins.processors.fusion_gate_processor import FusionGateProcessor
+from upf.plugins.processors.metrics_processor import MetricsProcessor
 
 from upf.plugins.sinks.console_sink import ConsoleSink
 from upf.plugins.sinks.alert_sink import AlertOnlySink
@@ -21,6 +22,7 @@ PLUGIN_REGISTRY = {
     "CorrelationProcessor": CorrelationProcessor,
     "ScoringProcessor": ScoringProcessor,
     "FusionGateProcessor": FusionGateProcessor,
+    "MetricsProcessor": MetricsProcessor,
 
     #Sinks
     "ConsoleSink": ConsoleSink,
