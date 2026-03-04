@@ -11,65 +11,57 @@ class VisionTemporalProcessor:
     def supported_event_types(self):
         return [EventType.DETECTION]
     
-    def __init__(
-            self,
-            window_seconds: float = 3.0,
-            drone_min_confidence: float = 0.65,
-            drone_min_count: int = 2,
-            fire_min_confidence: float = 0.80
-    ):
-        self.window_seconds = window_seconds
-        self.drone_min_confidence = drone_min_confidence
-        self.drone_min_count = drone_min_count
-        self.fire_min_confidence = fire_min_confidence
-
-        self.events = deque()  # Store recent events for temporal analysis
-        self.active = defaultdict(bool) # Track active alerts to prevent duplicates
+    def __init__(self, rules: dict):
+        """
+        rules example:
+        {
+          "fire":  {"window_seconds":3, "min_confidence":0.8, "min_count":1},
+          "smoke": {"window_seconds":5, "min_confidence":0.6, "min_count":2},
+          "drone": {"window_seconds":3, "min_confidence":0.65,"min_count":2},
+        }
+        """
+        self.rules = rules
+        self.events_by_label = defaultdict(deque)  # label -> deque of (timestamp, confidence)
+        self.active = defaultdict(bool)  # label -> whether an alert is currently active for that label
 
     async def process(self, event, bus):
-        now = time.time()
-        det = event.payload # Assuming payload is a DetectionPayload
+        det = event.payload
+        label = det.label  # Assuming payload is a DetectionPayload
 
-        self.events.append((now, det.label, det.confidence)) # Store timestamp, label, and confidence
-
-        while self.events and (now - self.events[0][0] > self.window_seconds):
-            self.events.popleft() # Remove old events outside the window
-
-        if det.label == "fire": #FIRE rule: if a fire detection with confidence above threshold is seen, trigger alert immediately
-            if det.confidence >= self.fire_min_confidence and not self.active["fire"]: # If confidence meets threshold and we haven't already triggered a fire alert, publish an alert and set active state
-                self.active["fire"] = True
-
-                alert_payload = AlertPayload(
-                    message=f"Vision: FIRE detected (conf={det.confidence})",
-                    count=1
-                )
-                alert = BaseEvent.create(
-                    event_type=EventType.ALERT,
-                    source_id="vision_temporal_processor",
-                    payload=alert_payload,
-                    correlation_id=event.event_id
-                )
-                await bus.publish(alert)
-            return
+        rule = self.rules.get(label)
+        if not rule:
+            return # No rule for this label, ignore 
         
-        if det.label == "drone":
-            hits = sum(1 for _, label, conf in self.events if label == "drone" and conf >= self.drone_min_confidence) # Count recent drone detections above confidence threshold
+        window_seconds = float(rule["window_seconds"])
+        min_confidence = float(rule["min_confidence"])
+        min_count = int(rule["min_count"])
+        now = time.time()
 
-            if hits >= self.drone_min_count and not self.active["drone"]: # If the count meets the threshold and we haven't already triggered an alert, publish an alert and set active state
-                self.active["drone"] = True
+        if det.confidence >= min_confidence: # Only consider detections that meet the confidence threshold
+            self.events_by_label[label].append((now, det.confidence))
 
-                alert_payload = AlertPayload(
-                    message=f"Vision: DRONE detected (hits={hits}, in {self.window_seconds} seconds)",
-                    count=hits
-                )
-                alert = BaseEvent.create(
-                    event_type=EventType.ALERT,
-                    source_id="vision_temporal_processor",
-                    payload=alert_payload,
-                    correlation_id=event.event_id
-                )
-                await bus.publish(alert)
+        # Remove old events outside the time window
+        q = self.events_by_label[label]
+        while q and (now - q[0][0] > window_seconds):
+            q.popleft()
 
-            if hits < self.drone_min_count: # If the count falls below the threshold, reset the active state to allow future alerts
-                self.active["drone"] = False
-                
+        hits = len(q)
+
+        if hits >= min_count and not self.active[label]:   # Only trigger alert if we have enough hits and no active alert for this label
+            self.active[label] = True
+
+            alert_payload = AlertPayload(
+                message=f"Vision: {label.upper()} detected (hits={hits} in {window_seconds}s)",
+                count=hits
+            )
+
+            alert = BaseEvent.create(
+                event_type=EventType.ALERT,
+                source_id="vision_temporal_processor",
+                payload=alert_payload,
+                correlation_id=event.event_id
+            )
+            await bus.publish(alert)
+
+        if hits < min_count:   # If we no longer meet the criteria for an active alert, reset the active state
+            self.active[label] = False  

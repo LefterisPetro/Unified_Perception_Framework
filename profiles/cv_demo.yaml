@@ -7,12 +7,24 @@ processors:
   - type: MetricsProcessor
     params:
       window_seconds: 5
+
   - type: VisionTemporalProcessor
     params:
-      window_seconds: 3
-      drone_min_confidence: 0.65
-      drone_min_count: 2
-      fire_min_confidence: 0.80
+      rules:
+        fire:
+          window_seconds: 3
+          min_confidence: 0.80
+          min_count: 1
+
+        smoke:
+          window_seconds: 5
+          min_confidence: 0.60
+          min_count: 2
+
+        drone:
+          window_seconds: 3
+          min_confidence: 0.65
+          min_count: 2
 
 sinks:
   - type: ConsoleSink
