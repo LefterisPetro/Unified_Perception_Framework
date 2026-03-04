@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 class MeasurementPayload(BaseModel):
     value: float
@@ -39,7 +39,7 @@ class BBoxPayload(BaseModel):
     h: float
 
 class DetectionPayload(BaseModel):
-    label: str
-    confidence: float
+    label: str   # "fire", "smoke", "drone"
+    confidence: float  # 0..1
     bbox: Optional[BBoxPayload] = None
     camera_id: Optional[str] = None

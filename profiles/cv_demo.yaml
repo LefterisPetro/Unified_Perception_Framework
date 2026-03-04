@@ -1,0 +1,20 @@
+sources:
+  - type: DetectionReplaySource
+    params:
+      file_path: demo_detections.jsonl
+
+processors:
+  - type: MetricsProcessor
+    params:
+      window_seconds: 5
+  - type: VisionTemporalProcessor
+    params:
+      window_seconds: 3
+      drone_min_confidence: 0.65
+      drone_min_count: 2
+      fire_min_confidence: 0.80
+
+sinks:
+  - type: ConsoleSink
+  - type: DetectionSink
+  - type: AlertOnlySink

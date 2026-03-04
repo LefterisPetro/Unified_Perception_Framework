@@ -10,7 +10,8 @@ class ConsoleSink:
                EventType.SYSTEM_HEALTH,
                EventType.CORRELATED_ALERT,
                EventType.FUSION_READY_ALERT,
-               EventType.METRICS_SNAPSHOT
+               EventType.METRICS_SNAPSHOT,
+               EventType.DETECTION
                ]
 
     async def handle(self, event):
