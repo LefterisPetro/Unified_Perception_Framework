@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Union
 
 class MeasurementPayload(BaseModel):
     value: float
@@ -12,7 +12,7 @@ class AlertPayload(BaseModel):
     count: int
 
 class ScoredAlertPayload(BaseModel):
-    original_alert: AlertPayload
+    original_alert: Union[VisionAlertPayload, AlertPayload] 
     confidence: float
     severity: str
 
@@ -42,4 +42,12 @@ class DetectionPayload(BaseModel):
     label: str   # "fire", "smoke", "drone"
     confidence: float  # 0..1
     bbox: Optional[BBoxPayload] = None
+    camera_id: Optional[str] = None
+
+class VisionAlertPayload(BaseModel):
+    label: str   # "fire", "smoke", "drone"
+    hits: int # number of detections that contributed to this alert within the time window
+    window_seconds: float # how long the detections were observed in seconds
+    min_confidence: float # minimum confidence of the detections that led to this alert
+    max_confidence: float # maximum confidence of the detections that led to this alert
     camera_id: Optional[str] = None

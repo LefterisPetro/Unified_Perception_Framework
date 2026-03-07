@@ -9,3 +9,4 @@ class EventType(str, Enum):
     FUSION_READY_ALERT = "FusionReadyAlertEvent"
     METRICS_SNAPSHOT = "MetricsSnapshot"
     DETECTION = "DetectionEvent"
+    VISION_ALERT = "VisionAlertEvent"

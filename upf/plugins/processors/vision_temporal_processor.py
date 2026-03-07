@@ -4,6 +4,7 @@ from collections import deque, defaultdict
 from upf.core.events import BaseEvent
 from upf.core.event_types import EventType
 from upf.core.event_payloads import AlertPayload
+from upf.core.event_payloads import VisionAlertPayload
 
 class VisionTemporalProcessor:
     @property
@@ -50,18 +51,24 @@ class VisionTemporalProcessor:
         if hits >= min_count and not self.active[label]:   # Only trigger alert if we have enough hits and no active alert for this label
             self.active[label] = True
 
-            alert_payload = AlertPayload(
-                message=f"Vision: {label.upper()} detected (hits={hits} in {window_seconds}s)",
-                count=hits
+            max_conf = max((conf for _, conf in q), default=det.confidence)
+
+            vision_payload = VisionAlertPayload(
+                label=label,
+                hits=hits,
+                window_seconds=window_seconds,
+                min_confidence=min_confidence,
+                max_confidence=max_conf,
+                camera_id=det.camera_id
             )
 
-            alert = BaseEvent.create(
-                event_type=EventType.ALERT,
+            vision_alert = BaseEvent.create(
+                event_type=EventType.VISION_ALERT,
                 source_id="vision_temporal_processor",
-                payload=alert_payload,
+                payload=vision_payload,
                 correlation_id=event.event_id
             )
-            await bus.publish(alert)
+            await bus.publish(vision_alert)
 
         if hits < min_count:   # If we no longer meet the criteria for an active alert, reset the active state
             self.active[label] = False  
