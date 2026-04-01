@@ -11,7 +11,8 @@ class ConsoleSink:
                EventType.CORRELATED_ALERT,
                EventType.FUSION_READY_ALERT,
                EventType.METRICS_SNAPSHOT,
-               EventType.DETECTION
+               EventType.DETECTION,
+               EventType.RF_CUE
                ]
 
     async def handle(self, event):

@@ -10,3 +10,5 @@ class EventType(str, Enum):
     METRICS_SNAPSHOT = "MetricsSnapshot"
     DETECTION = "DetectionEvent"
     VISION_ALERT = "VisionAlertEvent"
+    RF_CUE = "RFCueEvent"
+    

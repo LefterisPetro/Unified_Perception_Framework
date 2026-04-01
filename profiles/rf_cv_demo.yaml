@@ -1,0 +1,45 @@
+sources:
+  - type: DetectionReplaySource
+    params:
+      file_path: demo_detections.jsonl
+      
+  - type: RFCueReplaySource
+    params:
+      file_path: demo_rf_cues.jsonl
+
+  - type: HealthSource
+    params:
+      source_id: system_health
+
+processors:
+  - type: MetricsProcessor
+    params:
+      window_seconds: 5
+
+  - type: VisionTemporalProcessor
+    params:
+      rules:
+        fire: {window_seconds: 3, min_confidence: 0.80, min_count: 1}
+        smoke: {window_seconds: 5, min_confidence: 0.60, min_count: 2}
+        drone: {window_seconds: 3, min_confidence: 0.65, min_count: 2}
+    
+  - type: RuleBasedScoringProcessor
+    params:
+      rules:
+        fire: {base: 0.85, hit_weight: 0.05, severity: "HIGH"}
+        smoke: {base: 0.55, hit_weight: 0.07, severity: "MEDIUM"}
+        drone: {base: 0.60, hit_weight: 0.06, severity: "MEDIUM"}
+
+  - type: FusionGateProcessor
+    params:
+      min_confidence: 0.65
+
+  - type: CorrelationProcessor
+    params: {}
+
+sinks:
+  - type: ConsoleSink
+  - type: DetectionSink
+  - type: RFCueSink
+  - type: ScoredAlertSink
+  - type: CorrelatedAlertSink
