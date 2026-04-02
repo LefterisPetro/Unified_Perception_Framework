@@ -34,6 +34,13 @@ processors:
     params:
       min_confidence: 0.65
 
+  - type: RFFusionProcessor
+    params:
+      window_seconds: 2
+      min_rf_confidence: 0.55
+      boost_weight: 0.25
+      high_threshold: 0.85
+
   - type: CorrelationProcessor
     params: {}
 

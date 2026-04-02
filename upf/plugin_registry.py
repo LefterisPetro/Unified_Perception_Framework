@@ -10,6 +10,7 @@ from upf.plugins.processors.fusion_gate_processor import FusionGateProcessor
 from upf.plugins.processors.metrics_processor import MetricsProcessor
 from upf.plugins.processors.vision_temporal_processor import VisionTemporalProcessor
 from upf.plugins.processors.rule_based_scoring_processor import RuleBasedScoringProcessor
+from upf.plugins.processors.rf_fusion_processor import RFFusionProcessor
 
 from upf.plugins.sinks.console_sink import ConsoleSink
 from upf.plugins.sinks.alert_sink import AlertOnlySink
@@ -33,6 +34,7 @@ PLUGIN_REGISTRY = {
     "MetricsProcessor": MetricsProcessor,
     "VisionTemporalProcessor": VisionTemporalProcessor,
     "RuleBasedScoringProcessor": RuleBasedScoringProcessor,
+    "RFFusionProcessor": RFFusionProcessor,
 
     #Sinks
     "ConsoleSink": ConsoleSink,

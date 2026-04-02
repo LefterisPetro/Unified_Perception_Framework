@@ -21,6 +21,9 @@ class FusionReadyPayload(BaseModel):
     confidence: float # confidence that this alert is a true positive and should be fused, 0..1
     severity: str # severity level of the alert, e.g. "low", "medium", "high"
 
+    rf_cue: Optional[RFCuePayload] = None # optional RF cue that can be used for fusion, if available
+    rf_boost: Optional[float] = None # optional boost to the confidence based on RF cues, e.g. 0.1 to increase confidence by 10%
+
 class CorrelatedAlertPayload(BaseModel):
     message: str # a summary message for the correlated alert
     original_alert: FusionReadyPayload # the original alert that was fused and scored
