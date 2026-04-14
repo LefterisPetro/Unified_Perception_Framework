@@ -12,7 +12,10 @@ class ConsoleSink:
                EventType.FUSION_READY_ALERT,
                EventType.METRICS_SNAPSHOT,
                EventType.DETECTION,
-               EventType.RF_CUE
+               EventType.RF_CUE,
+               EventType.THERMAL_CUE,
+               EventType.SENSOR_CUE,
+               EventType.INCIDENT_UPDATE
                ]
 
     async def handle(self, event):

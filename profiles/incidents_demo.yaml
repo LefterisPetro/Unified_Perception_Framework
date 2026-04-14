@@ -1,0 +1,50 @@
+sources:
+  - type: RFCueReplaySource
+    params:
+      file_path: demo_rf_cues.jsonl
+
+  - type: DetectionReplaySource
+    params:
+      file_path: demo_detections.jsonl
+
+  - type: ThermalCueReplaySource
+    params:
+      file_path: demo_thermal_cues.jsonl
+
+  - type: HealthSource
+    params:
+      source_id: system_health
+
+processors:
+  - type: MetricsProcessor
+    params:
+      window_seconds: 5
+
+  - type: VisionTemporalProcessor
+    params:
+      rules:
+        drone: { window_seconds: 3, min_confidence: 0.65, min_count: 2 }
+        fire:  { window_seconds: 3, min_confidence: 0.80, min_count: 1 }
+        smoke: { window_seconds: 5, min_confidence: 0.60, min_count: 2 }
+
+  - type: VisionCueAdapter
+    params: {}
+
+  - type: RFCueAdapter
+    params:
+      default_label: "drone"
+
+  - type: ThermalCueAdapter
+    params:
+      default_label: "drone"
+
+  - type: IncidentManagerProcessor
+    params:
+      match_window_seconds: 3
+      lifetime_seconds: 10
+      confirm_min_sensors_by_label:
+        drone: 2
+
+sinks:
+  - type: IncidentSink
+  - type: ConsoleSink 
