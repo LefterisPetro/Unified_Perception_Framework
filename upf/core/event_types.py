@@ -14,3 +14,4 @@ class EventType(str, Enum):
     SENSOR_CUE = "SensorCueEvent"
     INCIDENT_UPDATE = "IncidentUpdateEvent"
     THERMAL_CUE = "ThermalCueEvent"
+    TICK = "TickEvent"

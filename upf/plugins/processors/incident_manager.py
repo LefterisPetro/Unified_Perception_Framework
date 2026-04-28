@@ -9,7 +9,7 @@ from upf.core.event_payloads import SensorCuePayload, IncidentUpdatePayload
 class IncidentManagerProcessor:
     @property
     def supported_event_types(self): 
-        return [EventType.SENSOR_CUE] 
+        return [EventType.SENSOR_CUE, EventType.TICK] # This processor will handle incoming sensor cues and periodic tick events to manage the lifecycle of incidents
     
     def __init__( 
             self,
@@ -57,7 +57,39 @@ class IncidentManagerProcessor:
         candidates.sort(reverse=True) # Sort the candidates by last seen time in descending order to prioritize the most recently updated incident
         return candidates[0][1] # Return the ID of the most recently updated matching incident
     
-    async def process(self, event, bus):
+    async def _expire_and_emit_lost(self, bus): # Internal method to check for incidents that have exceeded their lifetime and emit updates marking them as "LOST"
+        now = time.time()
+        for incident_id, incident in self.incidents.items(): # Iterate through active incidents to check if any have exceeded their lifetime and should be marked as "LOST"
+            if incident["status"] == "LOST": # Skip incidents that are already marked as "LOST"
+                continue
+            if now - incident["last_seen"] <= self.lifetime_seconds: # If the current time minus the last seen time of the incident does not exceed the lifetime threshold, skip this incident as it is still active
+                continue
+
+            incident["status"] = "LOST" # Mark the incident as "LOST" to indicate it is no longer active
+            payload = IncidentUpdatePayload( 
+                incident_id=incident_id,
+                label=incident["label"],
+                status="LOST",
+                sensors=sorted(list(incident["sensors"])),
+                confidence=round(float(incident.get("confidence", 0.0)), 2),
+                first_seen=incident["first_seen"],
+                last_seen=incident["last_seen"],
+                evidence_count=incident["evidence_count"],
+                last_cue=incident.get("last_cue")
+            )
+
+            update_event = BaseEvent.create(
+                event_type=EventType.INCIDENT_UPDATE,
+                source_id="incident_manager",
+                payload=payload,
+            )
+            await bus.publish(update_event)
+
+    async def process(self, event, bus): # Main method to process incoming events, which can be either sensor cues or tick events
+        if event.event_type == EventType.TICK: # If the incoming event is a tick event, we want to check for any incidents that have exceeded their lifetime and should be marked as "LOST"
+            await self._expire_and_emit_lost(bus) # On each tick event, check for and emit updates for any incidents that have exceeded their lifetime and should be marked as "LOST"
+            return
+
         self._cleanup() # Clean up expired incidents before processing the new event
 
         cue: SensorCuePayload = event.payload # Extract the sensor cue payload from the incoming event
@@ -80,6 +112,7 @@ class IncidentManagerProcessor:
                 }
         incident = self.incidents[incident_id] # Retrieve the incident data for the matched or newly created incident
         incident["last_seen"] = now # Update the last seen timestamp of the incident to the current time
+        incident["last_cue"] = cue # Store the most recent sensor cue that matched this incident for reference in the incident update payload
 
         if cue.camera_id and not incident.get("camera_id"): # If the incoming sensor cue has a camera_id and the incident does not already have a camera_id, associate the camera_id from the cue with the incident
             incident["camera_id"] = cue.camera_id

@@ -3,6 +3,7 @@ from upf.plugins.sources.health_source import HealthSource
 from upf.plugins.sources.detection_replay import DetectionReplaySource
 from upf.plugins.sources.rf_cue_replay import RFCueReplaySource
 from upf.plugins.sources.thermal_cue_replay import ThermalCueReplaySource
+from upf.plugins.sources.tick_source import TickSource
 
 from upf.plugins.processors.temporal_aggregator import TemporalAggregatorProcessor
 from upf.plugins.processors.correlation_processor import CorrelationProcessor
@@ -24,6 +25,7 @@ from upf.plugins.sinks.scored_sink import ScoredAlertSink
 from upf.plugins.sinks.detection_sink import DetectionSink
 from upf.plugins.sinks.rf_sink import RFCueSink
 from upf.plugins.sinks.incident_sink import IncidentSink
+from upf.plugins.sinks.incident_log_sink import IncidentLogSink
 
 PLUGIN_REGISTRY = {
     #Sources
@@ -32,7 +34,8 @@ PLUGIN_REGISTRY = {
     "DetectionReplaySource": DetectionReplaySource,
     "RFCueReplaySource": RFCueReplaySource,
     "ThermalCueReplaySource": ThermalCueReplaySource,
-
+    "TickSource": TickSource,
+    
     #Processors
     "TemporalAggregatorProcessor": TemporalAggregatorProcessor,
     "CorrelationProcessor": CorrelationProcessor,
@@ -56,5 +59,5 @@ PLUGIN_REGISTRY = {
     "DetectionSink": DetectionSink,
     "RFCueSink": RFCueSink,
     "IncidentSink": IncidentSink,
-
+    "IncidentLogSink": IncidentLogSink
 }

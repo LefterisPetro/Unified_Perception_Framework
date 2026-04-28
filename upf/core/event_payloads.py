@@ -82,7 +82,7 @@ class IncidentUpdatePayload(BaseModel):
     first_seen: float
     last_seen: float
     evidence_count: int # number of pieces of evidence (alerts, cues) that have contributed to this incident update
-    last_cue: SensorCuePayload # the most recent cue that contributed to this incident update
+    last_cue: Optional[SensorCuePayload] = None # the most recent sensor cue that contributed to this incident update, for reference
 
 class ThermalCuePayload(BaseModel):
     confidence: float # 0..1
