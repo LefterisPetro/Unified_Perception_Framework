@@ -1,1 +1,3 @@
 Unified_Perception_Framework
+The UPF I'm building is a modular, event-driven perception framework in Python, where I connect different sensors (camera, RF, thermal) as plugins and process them through common “events.” Using replay data, I can test the system without hardware, and the system performs fusion to generate incidents with a status of POSSIBLE → CONFIRMED when two different sensors confirm the same object (e.g., a UAV). At the same time, I maintain metrics and audit-friendly evidence of what each sensor detected, in order to reduce false positives and provide a foundation for the UI and logging.
+
